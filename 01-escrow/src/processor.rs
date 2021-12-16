@@ -6,6 +6,7 @@ use solana_program::{
     pubkey::Pubkey,
     program_pack::{Pack, IsInitialized},
     sysvar::{rent::Rent, Sysvar},
+    program::invoke
 };
 
 use crate::{instruction::EscrowInstruction, error::EscrowError, state::Escrow};
@@ -59,7 +60,7 @@ impl Processor {
         if escrow_info.is_initialized() {
             return Err(ProgramError::AccountAlreadyInitialized);
         }
-        
+
         escrow_info.is_initialized = true;
         escrow_info.initializer_pubkey = *initializer.key;
         escrow_info.temp_token_account_pubkey = *temp_token_account.key;
@@ -67,6 +68,27 @@ impl Processor {
         escrow_info.expected_amount = amount;
         
         Escrow::pack(escrow_info, &mut escrow_account.try_borrow_mut_data()?)?;
+        let (pda, _bump_seed) = Pubkey::find_program_address(&[b"escrow"], program_id);
+
+        let token_program = next_account_info(account_info_iter)?;
+        let owner_change_ix = spl_token::set_authority(
+            token_program.key,
+            temp_token_account.key,
+            Some(&pda),
+            spl_token::instruction::AuthorityType::AccountOwner,
+            initializer.key,
+            &[&initializer.key],
+        )?;
+
+        msg!("Calling the token program to transfer token account ownership...");
+        invoke(
+            &owner_change_ix,
+            &[
+                temp_token_account.clone(),
+                initializer.clone(),
+                token_program.clone(),
+            ],
+        )?;
 
         Ok(())
     }
