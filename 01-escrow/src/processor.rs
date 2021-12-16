@@ -71,7 +71,7 @@ impl Processor {
         let (pda, _bump_seed) = Pubkey::find_program_address(&[b"escrow"], program_id);
 
         let token_program = next_account_info(account_info_iter)?;
-        let owner_change_ix = spl_token::set_authority(
+        let owner_change_ix = spl_token::instruction::set_authority(
             token_program.key,
             temp_token_account.key,
             Some(&pda),

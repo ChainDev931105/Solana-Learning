@@ -1,7 +1,7 @@
 use solana_program::{
-    program_pack::{IsInitialized, Pack, Sealed}
+    program_pack::{IsInitialized, Pack, Sealed},
     program_error::ProgramError,
-    pubkey::Pubkey;
+    pubkey::Pubkey,
 };
 
 use arrayref::{array_mut_ref, array_ref, array_refs, mut_array_refs};
