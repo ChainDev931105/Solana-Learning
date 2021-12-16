@@ -20,6 +20,10 @@ impl Processor {
         }
     }
 
+    /// accounts
+    /// [0] => initializer
+    /// [0] => temp_token_account
+    /// [0] => token_to_receive_account
     fn process_init_escrow(
         accounts: &[AccountInfo],
         amount: u64,
@@ -30,6 +34,13 @@ impl Processor {
 
         if !initializer.is_signer {
             return Err(ProgramError::MissingRequiredSignature);
+        }
+
+        let temp_token_account = next_account_info(account_info_iter)?;
+
+        let token_to_receive_account = next_account_info(account_info_iter)?;
+        if *token_to_receive_account.owner != spl_token::id() {
+            return Err(ProgramError::IncorrectProgramId);
         }
 
         Ok(())
