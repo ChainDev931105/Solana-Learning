@@ -6,7 +6,7 @@ describe("basic-1", () => {
   // Use a local provider.
   const provider = anchor.Provider.local();
 
-  // Configure the client to use the local cluster.
+    // Configure the client to use the local cluster.
   anchor.setProvider(provider);
 
   it("Creates and initializes an account in a single atomic transaction (simplified)", async () => {
@@ -16,6 +16,8 @@ describe("basic-1", () => {
 
     // The Account to create.
     const myAccount = anchor.web3.Keypair.generate();
+    console.log(myAccount);
+    console.log("programId", SystemProgram.programId);
 
     // Create the new account and initialize it with the program.
     // #region code-simplified
